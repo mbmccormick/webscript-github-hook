@@ -87,11 +87,10 @@ for i = 1, # removed do
 	-- delete script from webscript servers
 	local response2 = http.request {
 		url = 'https://www.webscript.io/api/0.1/script/' .. repository .. '/' .. file,
-		method = 'POST',
+		method = 'DELETE',
 		auth = {
 			email,
 			key
-		},
-		data = ''
+		}
 	}
 end
