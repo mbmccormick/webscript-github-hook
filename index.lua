@@ -1,14 +1,19 @@
 -- extract credentials from query string
 local email = request.query.email
 local key = request.query.key
+local token = request.query.github
+
+-- build authentication header
+local requestHeaders = {
+	Authorization = 'token ' .. token
+}
 
 -- parse post-receive hook payload
 local data = json.parse(request.form.payload)
 
 -- extract repository name and url
 local repository = data.repository.name
-local repositoryUrl = data.repository.url
-
+local repositoryRawUrl = 'https://raw.githubusercontent.com/' .. data.repository.full_name
 -- initialize changelist arrays
 local added = {}
 local modified = {}
@@ -38,7 +43,8 @@ end
 for i = 1, # added do
 	-- fetch script from github repository
 	local response1 = http.request {
-		url = repositoryUrl .. '/raw/master/' .. added[i]
+		url = repositoryRawUrl .. '/master/' .. added[i],
+		headers = requestHeaders
 	}
 	
 	local script = response1.content
@@ -61,7 +67,8 @@ end
 for i = 1, # modified do
 	-- fetch script from github repository
 	local response1 = http.request {
-		url = repositoryUrl .. '/raw/master/' .. modified[i]
+		url = repositoryRawUrl .. '/master/' .. modified[i],
+		headers = requestHeaders
 	}
 	
 	local script = response1.content
